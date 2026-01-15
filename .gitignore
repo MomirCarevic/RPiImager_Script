@@ -1,0 +1,7 @@
+# Exclude the entire .vscode folder (contains workspace settings, etc)
+.vscode/
+
+# Custom rules for scripts (add common temporary or log files here)
+*.log
+*.tmp
+temp/
