@@ -17,10 +17,8 @@ IF NOT EXIST venv (
     python -m venv venv
 )
 
-REM Activate virtual environment
+REM Upgrade pip inside venv
 call venv\Scripts\activate.bat
-
-REM Upgrade pip
 python -m pip install --upgrade pip
 
 REM Install dependencies if requirements.txt exists
@@ -32,5 +30,10 @@ IF EXIST requirements.txt (
 echo.
 echo Virtual environment ready.
 echo To activate later, run:
-echo     venv\Scripts\activate
+echo     venv\Scripts\activate.bat
+echo.
+echo Starting PowerShell with custom prompt...
+
+REM Launch PowerShell with venv activated and custom prompt
+powershell -NoExit -ExecutionPolicy Bypass -Command "& { .\venv\Scripts\Activate.ps1; function prompt { '<econ> ' + $(Get-Location) + '> ' } }"
 
