@@ -1,0 +1,266 @@
+#!/usr/bin/env python3
+"""
+Raspberry Pi Imager Configuration Module
+Launches and configures Raspberry Pi Imager from the Downloads folder.
+"""
+
+import os
+import subprocess
+import sys
+from pathlib import Path
+from .detect_os import OSDetector
+
+
+class ImagerConfigurator:
+    """Configures and launches Raspberry Pi Imager."""
+
+    def __init__(self, detector=None):
+        """Initialize the configurator with OS detection."""
+        self.detector = detector if detector else OSDetector()
+        self.os_type = self.detector.get_os_type()
+        self.downloads_dir = self._get_downloads_folder()
+        self.imager_path = None
+
+    def _get_downloads_folder(self):
+        """Get the system's Downloads folder path."""
+        if self.detector.is_windows():
+            downloads = os.path.join(os.environ.get('USERPROFILE', ''), 'Downloads')
+        elif self.detector.is_macos() or self.detector.is_linux():
+            downloads = os.path.join(os.environ.get('HOME', ''), 'Downloads')
+        else:
+            downloads = 'downloads'
+        return Path(downloads)
+
+    def find_imager_executable(self):
+        """Find the Raspberry Pi Imager executable."""
+        print("Searching for Raspberry Pi Imager...")
+
+        if self.detector.is_windows():
+            # Check Downloads folder
+            downloaded_exe = self.downloads_dir / "rpi-imager-latest.exe"
+
+            # Check common installation paths
+            program_files = os.environ.get('PROGRAMFILES', 'C:\\Program Files')
+            program_files_x86 = os.environ.get('PROGRAMFILES(X86)', 'C:\\Program Files (x86)')
+
+            possible_paths = [
+                downloaded_exe,
+                Path(program_files) / "Raspberry Pi Imager" / "rpi-imager.exe",
+                Path(program_files_x86) / "Raspberry Pi Imager" / "rpi-imager.exe",
+            ]
+
+        elif self.detector.is_macos():
+            # Check Downloads folder
+            downloaded_dmg = self.downloads_dir / "rpi-imager-latest.dmg"
+
+            # Check Applications folder
+            possible_paths = [
+                downloaded_dmg,
+                Path("/Applications/Raspberry Pi Imager.app"),
+                Path.home() / "Applications" / "Raspberry Pi Imager.app",
+            ]
+
+        elif self.detector.is_linux():
+            # On Linux, rpi-imager is usually installed via package manager
+            # and available in PATH
+            possible_paths = [
+                Path("/usr/bin/rpi-imager"),
+                Path("/usr/local/bin/rpi-imager"),
+            ]
+
+        else:
+            print(f"✗ Unsupported OS: {self.os_type}")
+            return None
+
+        # Find the first existing path
+        for path in possible_paths:
+            if path.exists():
+                print(f"✓ Found Raspberry Pi Imager at: {path}")
+                self.imager_path = path
+                return path
+
+        print("✗ Raspberry Pi Imager not found in common locations")
+        print("\nSearched locations:")
+        for path in possible_paths:
+            print(f"  - {path}")
+        return None
+
+    def launch_imager_gui(self):
+        """Launch the Raspberry Pi Imager GUI application."""
+        if not self.imager_path:
+            if not self.find_imager_executable():
+                print("\n⚠ Please install Raspberry Pi Imager first or specify the path manually")
+                return False
+
+        print(f"\nLaunching Raspberry Pi Imager from: {self.imager_path}")
+
+        try:
+            if self.detector.is_windows():
+                # Windows: Launch the executable
+                subprocess.Popen([str(self.imager_path)], shell=True)
+                print("✓ Raspberry Pi Imager launched successfully")
+
+            elif self.detector.is_macos():
+                # macOS: Use 'open' command
+                if self.imager_path.suffix == '.app':
+                    subprocess.Popen(['open', str(self.imager_path)])
+                else:
+                    subprocess.Popen(['open', str(self.imager_path)])
+                print("✓ Raspberry Pi Imager launched successfully")
+
+            elif self.detector.is_linux():
+                # Linux: Launch the binary
+                subprocess.Popen([str(self.imager_path)])
+                print("✓ Raspberry Pi Imager launched successfully")
+
+            return True
+
+        except Exception as e:
+            print(f"✗ Error launching Raspberry Pi Imager: {e}")
+            return False
+
+    def check_cli_support(self):
+        """Check if rpi-imager CLI is available."""
+        if not self.imager_path:
+            if not self.find_imager_executable():
+                return False
+
+        try:
+            # Try to run with --help flag to check CLI support
+            result = subprocess.run(
+                [str(self.imager_path), "--help"],
+                capture_output=True,
+                text=True,
+                timeout=5
+            )
+
+            if result.returncode == 0:
+                print("✓ CLI support detected")
+                print("\nAvailable CLI options:")
+                print(result.stdout)
+                return True
+            else:
+                print("✗ No CLI support detected (GUI mode only)")
+                return False
+
+        except subprocess.TimeoutExpired:
+            print("✗ Command timed out - likely GUI mode only")
+            return False
+        except Exception as e:
+            print(f"✗ Error checking CLI support: {e}")
+            return False
+
+    def list_sd_cards(self):
+        """List available SD cards/drives."""
+        print("\n" + "=" * 60)
+        print("AVAILABLE STORAGE DEVICES")
+        print("=" * 60)
+
+        if not self.detector.is_admin():
+            print("⚠ WARNING: Not running with administrator/root privileges!")
+            print("  You may not see all devices or be able to write to SD cards.\n")
+
+        try:
+            if self.detector.is_windows():
+                # Windows: Use wmic to list disk drives
+                result = subprocess.run(
+                    ["wmic", "diskdrive", "get", "DeviceID,Size,Caption"],
+                    capture_output=True,
+                    text=True
+                )
+                print(result.stdout)
+
+            elif self.detector.is_linux():
+                # Linux: Use lsblk
+                result = subprocess.run(
+                    ["lsblk", "-o", "NAME,SIZE,TYPE,MOUNTPOINT,MODEL"],
+                    capture_output=True,
+                    text=True
+                )
+                print(result.stdout)
+
+            elif self.detector.is_macos():
+                # macOS: Use diskutil
+                result = subprocess.run(
+                    ["diskutil", "list"],
+                    capture_output=True,
+                    text=True
+                )
+                print(result.stdout)
+
+            print("=" * 60)
+            return True
+
+        except Exception as e:
+            print(f"✗ Error listing devices: {e}")
+            return False
+
+    def print_manual_instructions(self):
+        """Print manual configuration instructions."""
+        print("\n" + "=" * 60)
+        print("MANUAL CONFIGURATION INSTRUCTIONS")
+        print("=" * 60)
+        print("\nThe Raspberry Pi Imager GUI provides an easy interface to:")
+        print("  1. Select your Raspberry Pi device model")
+        print("  2. Choose an operating system (Raspberry Pi OS, Ubuntu, etc.)")
+        print("  3. Select your SD card")
+        print("  4. Configure advanced options (SSH, WiFi, hostname, etc.)")
+        print("  5. Write the OS image to the SD card")
+
+        print("\nAdvanced Settings (Gear Icon):")
+        print("  - Set hostname")
+        print("  - Enable SSH")
+        print("  - Configure WiFi credentials")
+        print("  - Set username and password")
+        print("  - Configure locale settings")
+
+        if self.detector.is_windows():
+            print("\n⚠ IMPORTANT FOR WINDOWS:")
+            print("  - Run as Administrator for SD card access")
+            print("  - Right-click on the executable and select 'Run as administrator'")
+
+        print("\n" + "=" * 60)
+
+
+def configure_and_launch():
+    """Main function to configure and launch Raspberry Pi Imager."""
+    print("=" * 60)
+    print("RASPBERRY PI IMAGER CONFIGURATOR")
+    print("=" * 60)
+
+    configurator = ImagerConfigurator()
+
+    # Find the imager
+    if not configurator.find_imager_executable():
+        print("\n⚠ Raspberry Pi Imager not found!")
+        print("Please run the script first to download it, or install it manually.")
+        return None
+
+    # Check for CLI support
+    print("\nChecking for CLI support...")
+    has_cli = configurator.check_cli_support()
+
+    if not has_cli:
+        print("\nRaspberry Pi Imager runs in GUI mode.")
+        print("You'll need to configure it through the graphical interface.")
+
+    # List available storage devices
+    configurator.list_sd_cards()
+
+    # Print manual instructions
+    configurator.print_manual_instructions()
+
+    # Ask user if they want to launch the GUI
+    print("\n" + "=" * 60)
+    response = input("Do you want to launch Raspberry Pi Imager now? (y/n): ").lower()
+
+    if response == 'y':
+        configurator.launch_imager_gui()
+    else:
+        print("Exiting without launching.")
+
+    return configurator
+
+
+if __name__ == "__main__":
+    configure_and_launch()

@@ -1,7 +1,84 @@
-# Exclude the entire .vscode folder (contains workspace settings, etc)
+# IDE and Editor
 .vscode/
+.idea/
+*.swp
+*.swo
+*~
 
-# Custom rules for scripts (add common temporary or log files here)
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+venv/
+ENV/
+env/
+.venv
+
+# Raspberry Pi Images and Large Files
+*.img
+*.iso
+*.zip
+*.gz
+*.tar
+*.tar.gz
+*.xz
+*.7z
+
+# SD Card related
+*.dd
+*.raw
+backup/
+images/
+
+# Logs and temporary files
 *.log
 *.tmp
 temp/
+logs/
+*.bak
+
+# OS specific
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Bash
+*.bash~
+*.sh~
+
+# Configuration files that might contain sensitive data
+config.ini
+secrets.ini
+*.secret
+.env
+credentials.json
+
+# Test artifacts
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.hypothesis/
