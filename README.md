@@ -1,5 +1,7 @@
 # [WIP] Script for easier flashing of Raspberry Pi OS
 
+This script automates proces of downloading Raspberry Pi Imager, running the imager and preparing SD card for headless boot.
+
 ## Prerequisites for running this script on a Linux machine
 
 Common with newer Ubuntu/Debian systems is that they are using externaly-managed Python environments. The best practice is to create a virtual environment for your porject. To create virtual environment you will need to run command:
