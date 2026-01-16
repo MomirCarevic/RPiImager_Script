@@ -1,8 +1,17 @@
 # [WIP] Script for easier flashing of Raspberry Pi OS
 
 This script automates proces of downloading Raspberry Pi Imager, running the imager and preparing SD card for headless boot.
+## Prerequisites for running this script on a **Windows** machine
 
-## Prerequisites for running this script on a Linux machine
+For this script to make headless boot work, password is encripted via openssl. Windows machines don't have installed OpenSSL and because of that you will need to install OpenSSL from [Shining Light Productions](https://slproweb.com/products/Win32OpenSSL.html) website or to use command:
+
+    choco install openssl -y
+
+After installing openssl, system must know where openssl.exe is located. 
+Find your OpenSSL bin folder (usually *C:\Program Files\OpenSSL-Win64\bin* or *C:\Program Files\Git\usr\bin*).
+
+
+## Prerequisites for running this script on a **Linux** machine
 
 Common with newer Ubuntu/Debian systems is that they are using externaly-managed Python environments. The best practice is to create a virtual environment for your porject. To create virtual environment you will need to run command:
 

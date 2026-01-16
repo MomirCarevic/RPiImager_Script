@@ -10,22 +10,9 @@ from pathlib import Path
 from getpass import getpass
 
 
-def create_bootfs_folder(drive_mountpoint):
-    """Create bootfs folder if it doesn't exist."""
-    bootfs_path = Path(drive_mountpoint) / "bootfs"
-
-    try:
-        bootfs_path.mkdir(parents=True, exist_ok=True)
-        print(f"bootfs folder ready at: {bootfs_path}")
-        return bootfs_path
-    except Exception as e:
-        print(f"Error creating bootfs folder: {e}")
-        return None
-
-
-def create_ssh_file(bootfs_path):
+def create_ssh_file(drive_path):
     """Create empty ssh file without extension."""
-    ssh_file = bootfs_path / "ssh"
+    ssh_file = drive_path / "ssh"
 
     try:
         # Create empty file
@@ -37,9 +24,9 @@ def create_ssh_file(bootfs_path):
         return False
 
 
-def create_userconf_file(bootfs_path):
+def create_userconf_file(drive_path):
     """Create empty userconf file without extension."""
-    userconf_file = bootfs_path / "userconf"
+    userconf_file = drive_path / "userconf"
 
     try:
         # Create empty file
@@ -124,12 +111,12 @@ def encrypt_password_with_openssl(password):
         return None
 
 
-def add_user_to_userconf(bootfs_path):
+def add_user_to_userconf(drive_path):
     """
     Add username and encrypted password to userconf file.
     Format: username:encrypted_password
     """
-    userconf_file = bootfs_path / "userconf"
+    userconf_file = drive_path / "userconf"
 
     try:
         # Get username from user
@@ -268,16 +255,14 @@ def make_files(selected_drive):
     print(f"Target drive: {selected_drive.device}")
     print(f"Mount point: {selected_drive.mountpoint}")
 
-    # Create bootfs folder
-    bootfs_path = create_bootfs_folder(selected_drive.mountpoint)
-    if not bootfs_path:
-        return False
+    # Get drive path
+    drive_path = Path(selected_drive.mountpoint)
 
     # Create ssh file
-    ssh_created = create_ssh_file(bootfs_path)
+    ssh_created = create_ssh_file(drive_path)
 
     # Create userconf file
-    userconf_created = create_userconf_file(bootfs_path)
+    userconf_created = create_userconf_file(drive_path)
 
     if not (ssh_created and userconf_created):
         print("\nSome files could not be created")
@@ -285,13 +270,13 @@ def make_files(selected_drive):
         return False
 
     # Add user configuration to userconf file
-    user_added = add_user_to_userconf(bootfs_path)
+    user_added = add_user_to_userconf(drive_path)
 
     print("=" * 60)
 
     if user_added:
         print("\nAll boot configuration files created successfully!")
-        print(f"\nFiles created in: {bootfs_path}")
+        print(f"\nFiles created in: {drive_path}")
         print("  - ssh (enables SSH on first boot)")
         print("  - userconf (user configuration file)")
         return True

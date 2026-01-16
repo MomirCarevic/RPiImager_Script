@@ -24,7 +24,7 @@ def main():
 
     # Check if Raspberry Pi Imager is already installed
     if is_imager_installed():
-        print("\nRaspberry Pi Imager is already installed on this system")
+        print("\nRaspberry Pi Imager is already installed on this system\n")
         print("=" * 60)
         print("STEP 2 : FLASH YOUR SD CARD")
         print("=" * 60)
@@ -46,11 +46,11 @@ def main():
         print("where you want to add additional files.")
         print("=" * 60)
 
-        
+        print("\nDo you need headless boot?")
         print("\tHeadless boot only works durign first boot and ")
         print("\tis used when you boot via ssh with no moniutor, ")
         print("\tkeyboard nor mouse.")
-        confirm = input("\n\nDo you need headless boot? (y/n): ")
+        confirm = input("(y/n): ")
 
         if confirm == 'y':
             selected_drive = select_drive()
@@ -79,7 +79,7 @@ def main():
 
             if success:
                 print("\n" + "=" * 60)
-                print("SETUP COMPLETE!")
+                print("HEADLESS SETUP COMPLETE!")
                 print("=" * 60)
                 print("Your Raspberry Pi SD card is now ready to use.")
                 print("You can safely eject the SD card and insert it into your Raspberry Pi.")
@@ -91,7 +91,7 @@ def main():
 
         elif confirm == 'n' :
             print("\n" + "=" * 60)
-            print("SETUP COMPLETE!")
+            print("NORMAL SETUP COMPLETE!")
             print("=" * 60)
             print("Your Raspberry Pi SD card is now ready to use.")
             print("You can safely eject the SD card and insert it into your Raspberry Pi.")
