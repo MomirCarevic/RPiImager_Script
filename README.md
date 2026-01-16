@@ -12,8 +12,11 @@ Find your OpenSSL bin folder (usually *C:\Program Files\OpenSSL-Win64\bin* or *C
 
 
 ## Prerequisites for running this script on a **Linux** machine
-
 Common with newer Ubuntu/Debian systems is that they are using externaly-managed Python environments. The best practice is to create a virtual environment for your porject. To create virtual environment you will need to run command:
+
+    ./econ_linux.sh
+
+If you want to do it manualy, follow next steps. Run command:
 
     python3 -m venv venv
 
