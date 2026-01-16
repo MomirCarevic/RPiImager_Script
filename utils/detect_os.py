@@ -113,8 +113,8 @@ def detect_and_display():
     detector.print_system_info()
 
     # Display the disk listing command for the current OS
-    disk_cmd = detector.get_disk_command()
-    if disk_cmd:
-        print(f"\nTo list available disks, run: {disk_cmd}")
+    #disk_cmd = detector.get_disk_command()
+    #if disk_cmd:
+    #    print(f"\nTo list available disks, run: {disk_cmd}")
 
     return detector

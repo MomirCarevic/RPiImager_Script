@@ -9,6 +9,7 @@ from utils.open_raspberrypi_imager import open_imager, is_imager_installed
 from utils.monitor_imager import monitor_and_wait
 from utils.select_drive import select_drive
 from utils.make_files import make_files
+from utils.utils import clear_screen
 
 
 def main():
@@ -16,27 +17,19 @@ def main():
     # Detect and display OS information
     detector = detect_and_display()
 
-    print("\n")
+    clear_screen()
     print("=" * 60)
-    print("CHECKING RASPBERRY PI IMAGER INSTALLATION")
+    print("STEP 1 : CHECKING RASPBERRY PI IMAGER INSTALLATION")
     print("=" * 60)
 
     # Check if Raspberry Pi Imager is already installed
     if is_imager_installed():
-        print("Raspberry Pi Imager is already installed on this system")
-
-        # Open Raspberry Pi Imager for flashing
-        print("\n")
+        print("\nRaspberry Pi Imager is already installed on this system")
         print("=" * 60)
-        print("STEP 1: FLASH YOUR SD CARD")
+        print("STEP 2 : FLASH YOUR SD CARD")
         print("=" * 60)
-        print("Please use Raspberry Pi Imager to:")
-        print("  1. Select your Raspberry Pi device")
-        print("  2. Choose the operating system")
-        print("  3. Select your SD card")
-        print("  4. Configure settings (SSH, WiFi, etc.)")
-        print("  5. Flash the SD card")
-        print("\nThe script will wait for you to complete the flashing...")
+        print("\nstarting Raspberry Pi Imager ...")
+        print("\n\n\n\n\nThe script will wait for you to complete the flashing...")
         print("=" * 60)
 
         open_imager()
@@ -45,50 +38,65 @@ def main():
         monitor_and_wait()
 
         # After flashing is complete, select the drive to add files
-        print("\n")
+        clear_screen()
         print("=" * 60)
-        print("STEP 2: SELECT THE FLASHED DRIVE")
+        print("STEP 3 : SELECT THE FLASHED DRIVE")
         print("=" * 60)
         print("Now that flashing is complete, please select the drive")
         print("where you want to add additional files.")
         print("=" * 60)
 
-        selected_drive = select_drive()
+        
+        print("\tHeadless boot only works durign first boot and ")
+        print("\tis used when you boot via ssh with no moniutor, ")
+        print("\tkeyboard nor mouse.")
+        confirm = input("\n\nDo you need headless boot? (y/n): ")
 
-        if not selected_drive:
-            print("\nNo drive selected. Exiting.")
-            return
+        if confirm == 'y':
+            selected_drive = select_drive()
 
-        print("\n" + "=" * 60)
-        print("DRIVE SELECTED FOR FILE OPERATIONS")
-        print("=" * 60)
-        print(f"Selected Drive: {selected_drive.device}")
-        print(f"Mount Point: {selected_drive.mountpoint}")
-        print(f"Size: {selected_drive.size / (1024**3):.2f} GB")
-        print(f"File System: {selected_drive.fstype}")
-        if selected_drive.label:
-            print(f"Label: {selected_drive.label}")
-        print("=" * 60)
+            if not selected_drive:
+                print("\nNo drive selected. Exiting.")
+                return
 
-        # Create boot configuration files
-        print("\n")
-        print("=" * 60)
-        print("STEP 3: CREATE BOOT CONFIGURATION FILES")
-        print("=" * 60)
+            print("\n" + "=" * 60)
+            print("DRIVE SELECTED FOR FILE OPERATIONS")
+            print("=" * 60)
+            print(f"Selected Drive: {selected_drive.device}")
+            print(f"Mount Point: {selected_drive.mountpoint}")
+            print(f"Size: {selected_drive.size / (1024**3):.2f} GB")
+            print(f"File System: {selected_drive.fstype}")
+            if selected_drive.label:
+                print(f"Label: {selected_drive.label}")
+            print("=" * 60)
+            # Create boot configuration files
+            print("\n")
+            print("=" * 60)
+            print("STEP 4 : CREATE HEADLESS BOOT CONFIGURATION FILES")
+            print("=" * 60)
 
-        success = make_files(selected_drive)
+            success = make_files(selected_drive)
 
-        if success:
+            if success:
+                print("\n" + "=" * 60)
+                print("SETUP COMPLETE!")
+                print("=" * 60)
+                print("Your Raspberry Pi SD card is now ready to use.")
+                print("You can safely eject the SD card and insert it into your Raspberry Pi.")
+                return
+            
+            else:
+                print("\nFailed to create all boot configuration files")
+                print("You may need to create them manually")
+
+        elif confirm == 'n' :
             print("\n" + "=" * 60)
             print("SETUP COMPLETE!")
             print("=" * 60)
             print("Your Raspberry Pi SD card is now ready to use.")
             print("You can safely eject the SD card and insert it into your Raspberry Pi.")
-        else:
-            print("\nFailed to create all boot configuration files")
-            print("You may need to create them manually")
 
-        return
+            return
 
     print("Raspberry Pi Imager is not installed on this system")
 

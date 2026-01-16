@@ -8,6 +8,7 @@ from .open_raspberrypi_imager import open_imager, is_imager_installed
 from .monitor_imager import monitor_and_wait
 from .select_drive import select_drive, list_available_drives, get_drive_info, DriveInfo
 from .make_files import make_files
+from .utils import clear_screen
 
 __all__ = [
     'OSDetector',
@@ -20,5 +21,6 @@ __all__ = [
     'list_available_drives',
     'get_drive_info',
     'DriveInfo',
-    'make_files'
+    'make_files',
+    'utils'
 ]

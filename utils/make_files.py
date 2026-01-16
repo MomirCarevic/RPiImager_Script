@@ -58,7 +58,6 @@ def check_openssl_installed():
             ["openssl", "version"],
             capture_output=True,
             text=True,
-            shell=True,
             timeout=5
         )
         return result.returncode == 0
@@ -113,12 +112,10 @@ def install_openssl_chocolatey():
 def encrypt_password_with_openssl(password):
     """Encrypt password using OpenSSL. Returns encrypted password or None."""
     try:
-        openssl_cmd = "openssl"
         result = subprocess.run(
-            [openssl_cmd, "passwd", "-6", password],
+            ["openssl", "passwd", "-6", password],
             capture_output=True,
             text=True,
-            shell=True,
             check=True,
             timeout=10
         )

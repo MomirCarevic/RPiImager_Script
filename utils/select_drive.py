@@ -270,10 +270,10 @@ def select_drive():
                 print(f"\nSelected: {selected_drive}")
 
                 # Ask for confirmation
-                confirm = input(f"\nAre you sure you want to use {selected_drive.device}? (yes/no): ").strip().lower()
+                confirm = input(f"\nAre you sure you want to use {selected_drive.device}? (y/n): ").strip().lower()
 
-                if confirm == 'yes':
-                    print(f"Drive {selected_drive.device} confirmed")
+                if confirm == 'y':
+                    print(f"\nDrive {selected_drive.device} confirmed")
                     return selected_drive
                 else:
                     print("Selection cancelled. Please choose again.\n")
