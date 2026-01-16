@@ -1,7 +1,7 @@
 @echo off
-REM ==========================================
-REM Python Virtual Environment Setup (Windows)
-REM ==========================================
+echo ==========================================
+echo Python Virtual Environment Setup (Windows)
+echo ==========================================
 
 REM Check if python is available
 python --version >nul 2>&1
@@ -33,4 +33,4 @@ echo.
 echo Virtual environment ready.
 echo To activate later, run:
 echo     venv\Scripts\activate
-pause
+
