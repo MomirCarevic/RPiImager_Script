@@ -36,4 +36,4 @@ echo ""
 echo "Starting bash with custom prompt..."
 
 # Launch bash with venv activated and custom prompt
-bash --rcfile <(echo ". venv/bin/activate; PS1='<econ> \w> '")
+bash --rcfile <(echo ". venv/bin/activate; PS1='\[\e[32m\]<econ>\[\e[0m\] \w> '")
